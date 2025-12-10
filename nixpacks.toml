@@ -1,12 +1,12 @@
 [phases.setup]
-nixPkgs = ["nodejs_22"]
+nixPkgs = ["nodejs_22", "bun"]
 
 [phases.install]
-cmds = ["npm ci --include=optional"]
+cmds = ["bun install"]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["bun run build"]
 
 [start]
-cmd = "npm run preview -- --host --port $PORT"
+cmd = "bun run preview -- --host --port $PORT"
 
