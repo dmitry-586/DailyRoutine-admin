@@ -8,5 +8,5 @@ cmds = ["bun install"]
 cmds = ["bun run build"]
 
 [start]
-cmd = "bun run preview -- --host --port $PORT"
+cmd = "bun run preview"
 
