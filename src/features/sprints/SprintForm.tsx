@@ -1,6 +1,6 @@
 import { Button, Input } from '@/shared/ui'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import type { CreateSprintDto } from './types'
 import { useCreateSprint, useSprint, useUpdateSprint } from './useSprints'
 
@@ -27,14 +27,14 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 		register,
 		handleSubmit,
 		reset,
-		watch,
+		control,
 		setValue,
 		formState: { isSubmitting },
 	} = useForm<CreateSprintDto>({
 		defaultValues,
 	})
 
-	const sprintType = watch('type')
+	const sprintType = useWatch({ control, name: 'type' })
 
 	useEffect(() => {
 		if (!sprint) {

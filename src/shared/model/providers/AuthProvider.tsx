@@ -1,14 +1,6 @@
 import { authApi } from '@/shared/lib/api'
-import { createContext, useContext, useEffect, useState } from 'react'
-
-interface AuthContextType {
-	isAuthenticated: boolean
-	isLoading: boolean
-	login: (username: string, password: string) => Promise<void>
-	logout: () => void
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+import { useEffect, useState } from 'react'
+import { AuthContext } from './AuthContext'
 
 const AUTH_KEY = 'admin_authenticated'
 const AUTH_DATA_KEY = 'admin_auth'
@@ -70,12 +62,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			{children}
 		</AuthContext.Provider>
 	)
-}
-
-export function useAuth() {
-	const context = useContext(AuthContext)
-	if (context === undefined) {
-		throw new Error('useAuth must be used within AuthProvider')
-	}
-	return context
 }
