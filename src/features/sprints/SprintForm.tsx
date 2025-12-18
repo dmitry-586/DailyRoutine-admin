@@ -19,7 +19,7 @@ const defaultValues: CreateSprintDto = {
 }
 
 export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
-	const { data: sprint } = useSprint(sprintId || 0)
+	const { data: sprint, isLoading: isLoadingSprint } = useSprint(sprintId ?? 0)
 	const createSprint = useCreateSprint()
 	const updateSprint = useUpdateSprint()
 
@@ -37,6 +37,15 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 	const sprintType = useWatch({ control, name: 'type' })
 
 	useEffect(() => {
+		if (sprintId === undefined) {
+			reset(defaultValues)
+			return
+		}
+
+		if (isLoadingSprint) {
+			return
+		}
+
 		if (!sprint) {
 			reset(defaultValues)
 			return
@@ -49,7 +58,7 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 			target_days: sprint.target_days,
 			coins_reward: sprint.coins_reward,
 		})
-	}, [reset, sprint])
+	}, [reset, sprint, sprintId, isLoadingSprint])
 
 	// Автоматически сбрасываем target_days на 0 при выборе типа new_habit
 	useEffect(() => {
@@ -75,7 +84,18 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 	}
 
 	const isLoading =
-		createSprint.isPending || updateSprint.isPending || isSubmitting
+		createSprint.isPending ||
+		updateSprint.isPending ||
+		isSubmitting ||
+		(sprintId !== undefined && isLoadingSprint)
+
+	if (sprintId !== undefined && isLoadingSprint) {
+		return (
+			<div className='flex items-center justify-center p-8'>
+				<p className='text-light-gray'>Загрузка данных спринта...</p>
+			</div>
+		)
+	}
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
