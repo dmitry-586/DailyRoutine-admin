@@ -25,8 +25,15 @@ export function Login() {
 		setApiError('')
 		try {
 			await login(data.username, data.password)
-		} catch {
-			setApiError('Неверное имя пользователя или пароль')
+		} catch (error) {
+			console.error('[Login] Ошибка при входе:', error)
+			const errorMessage =
+				error instanceof Error
+					? error.message.includes('API URL')
+						? 'Ошибка конфигурации: не задан адрес API сервера'
+						: error.message
+					: 'Неверное имя пользователя или пароль'
+			setApiError(errorMessage)
 		}
 	}
 
@@ -48,6 +55,7 @@ export function Login() {
 							placeholder='Введите имя пользователя'
 							disabled={isSubmitting}
 							autoFocus
+							autoComplete='username'
 							aria-invalid={errors.username ? 'true' : 'false'}
 						/>
 						{errors.username && (
@@ -64,6 +72,7 @@ export function Login() {
 							{...register('password')}
 							placeholder='Введите пароль'
 							disabled={isSubmitting}
+							autoComplete='current-password'
 							aria-invalid={errors.password ? 'true' : 'false'}
 						/>
 						{errors.password && (

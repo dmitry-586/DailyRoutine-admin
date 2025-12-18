@@ -27,7 +27,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			await authApi.check()
 			setIsAuthenticated(true)
 			localStorage.setItem(AUTH_KEY, 'true')
-		} catch {
+		} catch (error) {
+			console.error('[AuthProvider] Ошибка при проверке авторизации:', error)
 			setIsAuthenticated(false)
 			localStorage.removeItem(AUTH_KEY)
 			localStorage.removeItem(AUTH_DATA_KEY)
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			setIsAuthenticated(true)
 			localStorage.setItem(AUTH_KEY, 'true')
 		} catch (error) {
+			console.error('[AuthProvider] Ошибка при входе:', error)
 			setIsAuthenticated(false)
 			localStorage.removeItem(AUTH_KEY)
 			localStorage.removeItem(AUTH_DATA_KEY)
