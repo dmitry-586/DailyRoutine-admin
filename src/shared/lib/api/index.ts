@@ -1,3 +1,5 @@
+export { authApi } from './auth'
+export type { LoginCredentials } from './auth'
 export { apiClient, apiFetch } from './client'
 export { ApiError, handleApiError } from './errors'
 export { queryKeys } from './keys'

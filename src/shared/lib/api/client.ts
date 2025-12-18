@@ -17,12 +17,32 @@ export const apiClient: AxiosInstance = axios.create({
 
 apiClient.interceptors.request.use(config => {
 	config.baseURL = config.baseURL ?? ensureApiBaseUrl()
+
+	const authData = localStorage.getItem('admin_auth')
+	if (authData) {
+		try {
+			const { username, password } = JSON.parse(authData)
+			if (username && password) {
+				const credentials = btoa(`${username}:${password}`)
+				config.headers.Authorization = `Basic ${credentials}`
+			}
+		} catch (error) {
+			console.error('Ошибка парсинга данных авторизации:', error)
+			localStorage.removeItem('admin_auth')
+			localStorage.removeItem('admin_authenticated')
+		}
+	}
+
 	return config
 })
 
 apiClient.interceptors.response.use(
 	response => response,
 	async (error: AxiosError) => {
+		if (error.response?.status === 401) {
+			localStorage.removeItem('admin_auth')
+			localStorage.removeItem('admin_authenticated')
+		}
 		return Promise.reject(handleApiError(error))
 	}
 )
@@ -31,13 +51,9 @@ export async function apiFetch<TResponse = unknown>(
 	path: string,
 	config?: AxiosRequestConfig
 ): Promise<TResponse> {
-	try {
-		const response = await apiClient.request<TResponse>({
-			url: path,
-			...config,
-		})
-		return response.data
-	} catch (error) {
-		throw handleApiError(error)
-	}
+	const response = await apiClient.request<TResponse>({
+		url: path,
+		...config,
+	})
+	return response.data
 }

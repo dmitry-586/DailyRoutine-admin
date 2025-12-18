@@ -1,26 +1,30 @@
+export type SprintType = 'all_habits' | 'new_habit'
+
 export interface Sprint {
-	id: string
+	id: number
 	title: string
 	description: string
-	reward: number
-	progress: number
-	total: number
-	isActive: boolean
-	createdAt: string
-	updatedAt: string
+	type: SprintType
+	target_days: number
+	coins_reward: number
+	is_active: boolean
+	created_at: string
+	updated_at: string
 }
 
 export interface CreateSprintDto {
 	title: string
 	description: string
-	reward: number
-	total: number
+	type: SprintType
+	target_days: number
+	coins_reward: number
 }
 
 export interface UpdateSprintDto {
 	title?: string
 	description?: string
-	reward?: number
-	total?: number
-	isActive?: boolean
+	type?: SprintType
+	target_days?: number
+	coins_reward?: number
+	is_active?: boolean
 }

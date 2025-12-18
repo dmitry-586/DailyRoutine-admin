@@ -1,17 +1,27 @@
+import { ProtectedRoute } from '@/features/auth'
 import { SprintsList } from '@/features/sprints'
-import TanstackClientProvider from '@/shared/model/providers/TanstackClientProvider'
+import { AuthProvider, TanstackClientProvider } from '@/shared/model/providers'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './globals.css'
 
 function App() {
 	return (
-		<TanstackClientProvider>
-			<BrowserRouter>
-				<Routes>
-					<Route path='/' element={<SprintsList />} />
-				</Routes>
-			</BrowserRouter>
-		</TanstackClientProvider>
+		<AuthProvider>
+			<TanstackClientProvider>
+				<BrowserRouter>
+					<Routes>
+						<Route
+							path='/'
+							element={
+								<ProtectedRoute>
+									<SprintsList />
+								</ProtectedRoute>
+							}
+						/>
+					</Routes>
+				</BrowserRouter>
+			</TanstackClientProvider>
+		</AuthProvider>
 	)
 }
 

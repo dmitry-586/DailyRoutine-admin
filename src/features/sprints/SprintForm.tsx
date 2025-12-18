@@ -5,7 +5,7 @@ import type { CreateSprintDto } from './types'
 import { useCreateSprint, useSprint, useUpdateSprint } from './useSprints'
 
 interface SprintFormProps {
-	sprintId?: string
+	sprintId?: number
 	onSuccess: () => void
 	onCancel: () => void
 }
@@ -13,12 +13,13 @@ interface SprintFormProps {
 const defaultValues: CreateSprintDto = {
 	title: '',
 	description: '',
-	reward: 0,
-	total: 0,
+	type: 'all_habits',
+	target_days: 7,
+	coins_reward: 100,
 }
 
 export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
-	const { data: sprint } = useSprint(sprintId || '')
+	const { data: sprint } = useSprint(sprintId || 0)
 	const createSprint = useCreateSprint()
 	const updateSprint = useUpdateSprint()
 
@@ -26,10 +27,14 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 		register,
 		handleSubmit,
 		reset,
+		watch,
+		setValue,
 		formState: { isSubmitting },
 	} = useForm<CreateSprintDto>({
 		defaultValues,
 	})
+
+	const sprintType = watch('type')
 
 	useEffect(() => {
 		if (!sprint) {
@@ -40,19 +45,32 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 		reset({
 			title: sprint.title,
 			description: sprint.description,
-			reward: sprint.reward,
-			total: sprint.total,
+			type: sprint.type,
+			target_days: sprint.target_days,
+			coins_reward: sprint.coins_reward,
 		})
 	}, [reset, sprint])
 
+	// Автоматически сбрасываем target_days на 0 при выборе типа new_habit
+	useEffect(() => {
+		if (sprintType === 'new_habit') {
+			setValue('target_days', 0)
+		}
+	}, [sprintType, setValue])
+
 	const onSubmit = (data: CreateSprintDto) => {
+		const submitData: CreateSprintDto = {
+			...data,
+			target_days: data.type === 'new_habit' ? 0 : data.target_days,
+		}
+
 		if (sprintId) {
 			updateSprint.mutate(
-				{ id: sprintId, data },
+				{ id: sprintId, data: submitData },
 				{ onSuccess: () => onSuccess() }
 			)
 		} else {
-			createSprint.mutate(data, { onSuccess: () => onSuccess() })
+			createSprint.mutate(submitData, { onSuccess: () => onSuccess() })
 		}
 	}
 
@@ -83,14 +101,28 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 				/>
 			</div>
 
+			<div>
+				<label className='text-foreground mb-2 block text-sm font-medium'>
+					Тип спринта
+				</label>
+				<select
+					{...register('type', { required: true })}
+					disabled={isLoading}
+					className='border-primary/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors focus:ring-2'
+				>
+					<option value='all_habits'>Выполнять все привычки N дней</option>
+					<option value='new_habit'>Создать новую привычку</option>
+				</select>
+			</div>
+
 			<div className='grid grid-cols-2 gap-4'>
 				<div>
 					<label className='text-foreground mb-2 block text-sm font-medium'>
-						Награда
+						Награда (коины)
 					</label>
 					<Input
 						type='number'
-						{...register('reward', {
+						{...register('coins_reward', {
 							required: true,
 							valueAsNumber: true,
 							min: 0,
@@ -103,19 +135,24 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 
 				<div>
 					<label className='text-foreground mb-2 block text-sm font-medium'>
-						Целевое значение
+						Целевое количество дней
 					</label>
 					<Input
 						type='number'
-						{...register('total', {
+						{...register('target_days', {
 							required: true,
 							valueAsNumber: true,
-							min: 1,
+							min: 0,
 						})}
 						placeholder='0'
-						min={1}
-						disabled={isLoading}
+						min={0}
+						disabled={isLoading || sprintType === 'new_habit'}
 					/>
+					{sprintType === 'new_habit' && (
+						<p className='text-light-gray mt-1 text-xs'>
+							Для типа "Создать новую привычку" всегда 0
+						</p>
+					)}
 				</div>
 			</div>
 

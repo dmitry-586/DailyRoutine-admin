@@ -1,5 +1,6 @@
+import { useAuth } from '@/shared/model/providers'
 import { Button, Modal, PageHeader } from '@/shared/ui'
-import { Plus, Target } from 'lucide-react'
+import { LogOut, Plus, Target } from 'lucide-react'
 import { useState } from 'react'
 import { SprintCard } from './SprintCard'
 import { SprintForm } from './SprintForm'
@@ -7,9 +8,10 @@ import { useDeleteSprint, useSprints } from './useSprints'
 
 export function SprintsList() {
 	const { data: sprints, isLoading } = useSprints()
+	const { logout } = useAuth()
 	const deleteSprint = useDeleteSprint()
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-	const [editingSprint, setEditingSprint] = useState<string | null>(null)
+	const [editingSprint, setEditingSprint] = useState<number | null>(null)
 
 	if (isLoading) {
 		return (
@@ -27,13 +29,19 @@ export function SprintsList() {
 					description='Создавайте и управляйте спринтами для пользователей'
 					icon={Target}
 				/>
-				<Button onClick={() => setIsCreateModalOpen(true)}>
-					<Plus className='h-4 w-4' />
-					Создать спринт
-				</Button>
+				<div className='flex gap-2'>
+					<Button onClick={() => setIsCreateModalOpen(true)}>
+						<Plus className='h-4 w-4' />
+						Создать спринт
+					</Button>
+					<Button variant='primary' onClick={logout}>
+						<LogOut className='h-4 w-4' />
+						Выход
+					</Button>
+				</div>
 			</div>
 
-			{!sprints || sprints.length === 0 ? (
+			{!sprints?.length ? (
 				<div className='border-primary/20 rounded-lg border p-12 text-center'>
 					<Target className='text-primary mx-auto mb-4 h-12 w-12 opacity-50' />
 					<p className='text-light-gray mb-2 text-lg'>Спринты не найдены</p>

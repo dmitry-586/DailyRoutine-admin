@@ -6,12 +6,12 @@ import type {
 import { apiFetch } from './client'
 
 export const sprintsApi = {
-	getAll: () => apiFetch<Sprint[]>('/sprints'),
-	getById: (id: string) => apiFetch<Sprint>(`/sprints/${id}`),
+	getAll: () => apiFetch<Sprint[]>('/admin/sprints'),
+	getById: (id: string) => apiFetch<Sprint>(`/admin/sprints/${id}`),
 	create: (data: CreateSprintDto) =>
-		apiFetch<Sprint>('/sprints', { method: 'POST', data }),
+		apiFetch<Sprint>('/admin/sprints', { method: 'POST', data }),
 	update: (id: string, data: UpdateSprintDto) =>
-		apiFetch<Sprint>(`/sprints/${id}`, { method: 'PATCH', data }),
+		apiFetch<Sprint>(`/admin/sprints/${id}`, { method: 'PUT', data }),
 	delete: (id: string) =>
-		apiFetch<void>(`/sprints/${id}`, { method: 'DELETE' }),
+		apiFetch<void>(`/admin/sprints/${id}`, { method: 'DELETE' }),
 }
