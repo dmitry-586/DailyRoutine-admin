@@ -28,7 +28,6 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 		handleSubmit,
 		reset,
 		control,
-		setValue,
 		formState: { isSubmitting },
 	} = useForm<CreateSprintDto>({
 		defaultValues,
@@ -60,17 +59,9 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 		})
 	}, [reset, sprint, sprintId, isLoadingSprint])
 
-	// Автоматически сбрасываем target_days на 0 при выборе типа new_habit
-	useEffect(() => {
-		if (sprintType === 'new_habit') {
-			setValue('target_days', 0)
-		}
-	}, [sprintType, setValue])
-
 	const onSubmit = (data: CreateSprintDto) => {
 		const submitData: CreateSprintDto = {
 			...data,
-			target_days: data.type === 'new_habit' ? 0 : data.target_days,
 		}
 
 		if (sprintId) {
@@ -155,7 +146,7 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 
 				<div>
 					<label className='text-foreground mb-2 block text-sm font-medium'>
-						Целевое количество дней
+						{sprintType === 'new_habit' ? 'Кол-во привычек' : 'Целевое количество дней'}
 					</label>
 					<Input
 						type='number'
@@ -166,13 +157,8 @@ export function SprintForm({ sprintId, onSuccess, onCancel }: SprintFormProps) {
 						})}
 						placeholder='0'
 						min={0}
-						disabled={isLoading || sprintType === 'new_habit'}
+						disabled={isLoading}
 					/>
-					{sprintType === 'new_habit' && (
-						<p className='text-light-gray mt-1 text-xs'>
-							Для типа "Создать новую привычку" всегда 0
-						</p>
-					)}
 				</div>
 			</div>
 
